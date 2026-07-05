@@ -1,31 +1,43 @@
 
+const GAS_URL = "https://script.google.com/macros/s/AKfycbw5tUc9_RHrqi3hxF3y4BaZLyiNdM-plgyFXRaGklwNRycWE663SuRl_7eS4fd98XVu/exec";
+
 async function loadQuestions(subject = "history") {
+
     try {
-        const res = await fetch(`data/${subject}.json`);
+        const res = await fetch(GAS_URL);
 
         if (!res.ok) {
-            throw new Error("Failed to load JSON");
+            throw new Error("Failed to load GAS data");
         }
 
         const data = await res.json();
 
-        // 安全チェック（壊れ防止）
         if (!Array.isArray(data)) {
-            throw new Error("Invalid format");
+            throw new Error("Invalid format from GAS");
         }
 
-        return data;
+        const filtered = data.filter(q => q.subject === subject);
+
+        if (filtered.length === 0) {
+            return [{
+                question: "この教科の問題がありません",
+                choices: ["OK", "戻る", "確認", "再読込"],
+                answer: 0,
+                explanation: "Sheetsに該当subjectの問題がありません"
+            }];
+        }
+
+        return filtered;
 
     } catch (err) {
         console.error("Loader error:", err);
 
-        // フォールバック（絶対クラッシュ防止）
         return [
             {
                 question: "データ読み込みエラーが発生しました",
                 choices: ["再読込", "設定確認", "戻る", "OK"],
                 answer: 3,
-                explanation: "JSONファイルまたはパスを確認してください"
+                explanation: "GAS URLまたはデプロイ設定を確認してください"
             }
         ];
     }
