@@ -1,72 +1,57 @@
 
-// =====================
-// 状態
-// =====================
 let questions = [];
 let currentIndex = 0;
 let score = 0;
 
-// =====================
-// DOM
-// =====================
-const questionEl = document.getElementById("question");
-const choicesEl = document.getElementById("choices");
-const questionNumberEl = document.getElementById("questionNumber");
-const progressTextEl = document.getElementById("progressText");
-const progressBarEl = document.getElementById("progressBar");
-const resultArea = document.getElementById("resultArea");
-const judgeEl = document.getElementById("judge");
-const explanationEl = document.getElementById("explanation");
-const nextButton = document.getElementById("nextButton");
-
-// =====================
-// 初期化（完全非同期対応）
-// =====================
+// =============================
+// 初期化
+// =============================
 window.addEventListener("DOMContentLoaded", async () => {
 
-    // URLからsubject取得
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(window.location.search);
     const subject = params.get("subject") || "history";
+    const mode = params.get("mode") || subject;
 
-    try {
-        questions = await loadQuestions(subject);
+    questions = await loadQuestions(subject);
 
-        startQuiz();
-
-    } catch (e) {
-        console.error(e);
-
-        questionEl.textContent = "読み込み失敗";
+    // 今日の10問モード対応（将来用）
+    if (mode === "today") {
+        questions = shuffle(questions).slice(0, 10);
     }
-});
 
-// =====================
-// 開始
-// =====================
-function startQuiz() {
     currentIndex = 0;
     score = 0;
-    showQuestion();
-}
 
-// =====================
-// 表示
-// =====================
+    showQuestion();
+});
+
+// =============================
+// 問題表示
+// =============================
 function showQuestion() {
 
     const q = questions[currentIndex];
 
-    questionEl.textContent = q.question;
+    if (!q) {
+        showResultScreen();
+        return;
+    }
 
-    questionNumberEl.textContent = `第${currentIndex + 1}問`;
-    progressTextEl.textContent = `${currentIndex + 1} / ${questions.length}`;
+    document.getElementById("question").textContent = q.question;
 
-    progressBarEl.style.width =
-        ((currentIndex + 1) / questions.length) * 100 + "%";
+    document.getElementById("questionNumber").textContent =
+        `第${currentIndex + 1}問`;
 
-    choicesEl.innerHTML = "";
-    resultArea.classList.add("hidden");
-    nextButton.classList.add("hidden");
+    document.getElementById("progressText").textContent =
+        `${currentIndex + 1} / ${questions.length}`;
+
+    updateProgressBar();
+
+    const choicesDiv = document.getElementById("choices");
+    choicesDiv.innerHTML = "";
+
+    document.getElementById("resultArea").classList.add("hidden");
+    document.getElementById("nextButton").classList.add("hidden");
 
     q.choices.forEach((choice, index) => {
 
@@ -74,75 +59,102 @@ function showQuestion() {
         btn.className = "choice-btn";
         btn.textContent = choice;
 
-        btn.onclick = () => selectAnswer(index);
+        btn.onclick = () => checkAnswer(index);
 
-        choicesEl.appendChild(btn);
+        choicesDiv.appendChild(btn);
     });
 }
 
-// =====================
-// 回答
-// =====================
-function selectAnswer(index) {
+// =============================
+// 回答チェック
+// =============================
+function checkAnswer(selected) {
 
     const q = questions[currentIndex];
-    const buttons = document.querySelectorAll(".choice-btn");
 
-    buttons.forEach(b => b.disabled = true);
+    const isCorrect = selected === q.answer;
 
-    const correct = index === q.answer;
+    const judge = document.getElementById("judge");
+    const explanation = document.getElementById("explanation");
 
-    if (correct) {
+    if (isCorrect) {
+        judge.textContent = "⭕ 正解！";
         score++;
-        judgeEl.textContent = "⭕ 正解";
     } else {
-        judgeEl.textContent = "❌ 不正解";
+        judge.textContent = "❌ 不正解";
     }
 
-    buttons[q.answer].style.background = "#4CAF50";
-    buttons[q.answer].style.color = "#fff";
+    explanation.textContent = q.explanation || "";
 
-    if (!correct) {
-        buttons[index].style.background = "#f44336";
-        buttons[index].style.color = "#fff";
-    }
+    document.getElementById("resultArea").classList.remove("hidden");
+    document.getElementById("nextButton").classList.remove("hidden");
 
-    explanationEl.textContent = q.explanation || "";
-
-    resultArea.classList.remove("hidden");
-    nextButton.classList.remove("hidden");
+    // 選択ボタンを無効化
+    document.querySelectorAll(".choice-btn").forEach(btn => {
+        btn.disabled = true;
+    });
 }
 
-// =====================
-// 次へ
-// =====================
-nextButton.onclick = () => {
+// =============================
+// 次へボタン
+// =============================
+document.getElementById("nextButton").addEventListener("click", () => {
 
     currentIndex++;
 
-    if (currentIndex < questions.length) {
-        showQuestion();
-    } else {
-        showResult();
+    if (currentIndex >= questions.length) {
+        showResultScreen();
+        return;
     }
-};
 
-// =====================
-// 結果
-// =====================
-function showResult() {
+    showQuestion();
+});
 
-    questionEl.textContent = "終了";
+// =============================
+// 結果画面
+// =============================
+function showResultScreen() {
 
-    choicesEl.innerHTML = "";
+    document.getElementById("question").textContent = "終了！";
 
-    judgeEl.textContent = "結果";
-    explanationEl.textContent =
-        `スコア：${score} / ${questions.length}`;
+    document.getElementById("choices").innerHTML = "";
 
-    nextButton.classList.add("hidden");
+    document.getElementById("resultArea").classList.remove("hidden");
+    document.getElementById("judge").textContent = "結果";
+    document.getElementById("explanation").textContent =
+        `正解数：${score} / ${questions.length}`;
 
-    progressBarEl.style.width = "100%";
-    progressTextEl.textContent =
-        `${questions.length} / ${questions.length}`;
+    document.getElementById("nextButton").textContent = "Topへ戻る";
+    document.getElementById("nextButton").classList.remove("hidden");
+
+    document.getElementById("nextButton").onclick = () => {
+        window.location.href = "index.html";
+    };
+}
+
+// =============================
+// 進捗バー
+// =============================
+function updateProgressBar() {
+
+    const bar = document.getElementById("progressBar");
+
+    const percent = ((currentIndex + 1) / questions.length) * 100;
+
+    bar.style.width = percent + "%";
+}
+
+// =============================
+// シャッフル（今日の10問用）
+// =============================
+function shuffle(array) {
+
+    for (let i = array.length - 1; i > 0; i--) {
+
+        const j = Math.floor(Math.random() * (i + 1));
+
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+
+    return array;
 }
