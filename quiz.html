@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SocialTest - クイズ</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/quiz.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <h1>📚 SocialTest</h1>
+
+    <p id="subjectTitle">
+        社会クイズ
+    </p>
+
+</header>
+
+<main class="container">
+
+    <section class="card quiz-card">
+
+        <div class="quiz-header">
+
+            <span id="questionNumber">
+
+                第1問
+
+            </span>
+
+            <span id="progressText">
+
+                1 / 10
+
+            </span>
+
+        </div>
+
+        <div class="progress">
+
+            <div id="progressBar"
+                 class="progress-bar"></div>
+
+        </div>
+
+        <h2 id="question">
+
+            読み込み中...
+
+        </h2>
+
+        <div id="choices"
+             class="choices">
+
+        </div>
+
+        <div
+            id="resultArea"
+            class="result hidden">
+
+            <h3 id="judge"></h3>
+
+            <p id="explanation"></p>
+
+        </div>
+
+        <div class="button-area">
+
+            <button
+                id="nextButton"
+                class="btn hidden">
+
+                次の問題 →
+
+            </button>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script src="js/storage.js"></script>
+<script src="js/loader.js"></script>
+<script src="js/quiz.js"></script>
+
+</body>
+
+</html>
