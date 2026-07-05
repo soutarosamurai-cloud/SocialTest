@@ -4,6 +4,37 @@ let currentIndex = 0;
 let score = 0;
 
 // =============================
+// ログ取得
+// =============================
+function getLog() {
+    return JSON.parse(localStorage.getItem("quizLog") || "{}");
+}
+
+// =============================
+// 弱点抽出
+// =============================
+function getWeakQuestions(allQuestions) {
+
+    const log = getLog();
+
+    return allQuestions.filter(q => {
+
+        const l = log[q.id];
+
+        if (!l) return false; // 未学習は除外（必要ならtrueに変更可）
+
+        const total = l.correct + l.wrong;
+
+        const accuracy = total === 0 ? 0 : l.correct / total;
+
+        return (
+            l.wrong >= 2 ||
+            accuracy < 0.5
+        );
+    });
+}
+
+// =============================
 // 初期化
 // =============================
 window.addEventListener("DOMContentLoaded", async () => {
@@ -12,11 +43,41 @@ window.addEventListener("DOMContentLoaded", async () => {
     const subject = params.get("subject") || "history";
     const mode = params.get("mode") || subject;
 
-    questions = await loadQuestions(subject);
+    let history = [];
+    let geography = [];
+    let civics = [];
 
-    // 今日の10問モード対応（将来用）
+    history = await loadQuestions("history");
+    geography = await loadQuestions("geography");
+    civics = await loadQuestions("civics");
+
+    const all = [...history, ...geography, ...civics];
+
+    // -----------------------------
+    // モード分岐
+    // -----------------------------
     if (mode === "today") {
-        questions = shuffle(questions).slice(0, 10);
+
+        questions = shuffle(all).slice(0, 10);
+
+    } else if (mode === "weak") {
+
+        questions = getWeakQuestions(all);
+
+        // 弱点がない場合
+        if (questions.length === 0) {
+            questions = [{
+                id: "none",
+                question: "弱点問題はありません！",
+                choices: ["OK", "戻る", "復習", "終了"],
+                answer: 0,
+                explanation: "全体的に安定しています"
+            }];
+        }
+
+    } else {
+
+        questions = await loadQuestions(subject);
     }
 
     currentIndex = 0;
@@ -66,7 +127,7 @@ function showQuestion() {
 }
 
 // =============================
-// 回答チェック
+// 回答チェック（ログ付き）
 // =============================
 function checkAnswer(selected) {
 
@@ -74,29 +135,37 @@ function checkAnswer(selected) {
 
     const isCorrect = selected === q.answer;
 
-    const judge = document.getElementById("judge");
-    const explanation = document.getElementById("explanation");
+    const log = getLog();
 
-    if (isCorrect) {
-        judge.textContent = "⭕ 正解！";
-        score++;
-    } else {
-        judge.textContent = "❌ 不正解";
+    if (!log[q.id]) {
+        log[q.id] = { correct: 0, wrong: 0 };
     }
 
-    explanation.textContent = q.explanation || "";
+    if (isCorrect) {
+        log[q.id].correct++;
+        score++;
+    } else {
+        log[q.id].wrong++;
+    }
+
+    localStorage.setItem("quizLog", JSON.stringify(log));
+
+    document.getElementById("judge").textContent =
+        isCorrect ? "⭕ 正解！" : "❌ 不正解";
+
+    document.getElementById("explanation").textContent =
+        q.explanation || "";
 
     document.getElementById("resultArea").classList.remove("hidden");
     document.getElementById("nextButton").classList.remove("hidden");
 
-    // 選択ボタンを無効化
     document.querySelectorAll(".choice-btn").forEach(btn => {
         btn.disabled = true;
     });
 }
 
 // =============================
-// 次へボタン
+// 次へ
 // =============================
 document.getElementById("nextButton").addEventListener("click", () => {
 
@@ -120,14 +189,17 @@ function showResultScreen() {
     document.getElementById("choices").innerHTML = "";
 
     document.getElementById("resultArea").classList.remove("hidden");
+
     document.getElementById("judge").textContent = "結果";
+
     document.getElementById("explanation").textContent =
         `正解数：${score} / ${questions.length}`;
 
-    document.getElementById("nextButton").textContent = "Topへ戻る";
-    document.getElementById("nextButton").classList.remove("hidden");
+    const btn = document.getElementById("nextButton");
+    btn.textContent = "Topへ戻る";
+    btn.classList.remove("hidden");
 
-    document.getElementById("nextButton").onclick = () => {
+    btn.onclick = () => {
         window.location.href = "index.html";
     };
 }
@@ -145,7 +217,7 @@ function updateProgressBar() {
 }
 
 // =============================
-// シャッフル（今日の10問用）
+// シャッフル
 // =============================
 function shuffle(array) {
 
