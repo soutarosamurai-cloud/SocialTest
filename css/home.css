@@ -1,0 +1,104 @@
+/* ==========================================
+   SocialTest ホーム画面
+   Version 1.0
+========================================== */
+
+.welcome{
+    padding:30px;
+    margin-bottom:30px;
+    text-align:center;
+}
+
+.welcome h2{
+    font-size:2rem;
+    margin-bottom:10px;
+}
+
+.welcome p{
+    color:var(--subtext);
+    font-size:1.1rem;
+}
+
+.menu{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:22px;
+    margin-bottom:35px;
+}
+
+.menu-card{
+    padding:30px 20px;
+    text-align:center;
+    transition:.25s;
+    cursor:pointer;
+}
+
+.menu-card:hover{
+    transform:translateY(-8px) scale(1.02);
+}
+
+.menu-card .icon{
+    font-size:3.2rem;
+    margin-bottom:18px;
+}
+
+.menu-card h2{
+    font-size:1.4rem;
+    margin-bottom:8px;
+}
+
+.menu-card p{
+    color:var(--subtext);
+}
+
+.status{
+    padding:30px;
+}
+
+.status h2{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.status-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+}
+
+.status-grid div{
+    background:#f8fbff;
+    border-radius:14px;
+    padding:25px;
+    text-align:center;
+}
+
+.status-grid h3{
+    font-size:2.2rem;
+    color:var(--primary);
+    margin-bottom:8px;
+}
+
+.status-grid p{
+    color:var(--subtext);
+}
+
+@media(max-width:768px){
+
+    .welcome{
+        padding:22px;
+    }
+
+    .welcome h2{
+        font-size:1.6rem;
+    }
+
+    .menu{
+        grid-template-columns:1fr;
+    }
+
+    .status-grid{
+        grid-template-columns:1fr;
+    }
+
+}
