@@ -1,252 +1,81 @@
-/* ==========================================
-   SocialTest 共通スタイル
-   Version 1.0
-========================================== */
-
-:root{
-    --primary:#1565C0;
-    --primary-dark:#0D47A1;
-    --secondary:#42A5F5;
-
-    --background:#F5F7FA;
-    --card:#FFFFFF;
-
-    --text:#263238;
-    --subtext:#607D8B;
-
-    --success:#4CAF50;
-    --danger:#E53935;
-    --warning:#FB8C00;
-
-    --shadow:0 6px 18px rgba(0,0,0,.12);
-
-    --radius:18px;
-
-    --transition:.25s;
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+    "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  background: #f2f4f8;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
 }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+#app {
+  width: 100%;
+  max-width: 420px;
+  min-height: 100vh;
+  background: white;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-html{
-    scroll-behavior:smooth;
+/* 問題 */
+#question {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.5;
+  margin: 30px 0 20px;
 }
 
-body{
-
-    font-family:
-    "Yu Gothic",
-    "Hiragino Sans",
-    "Meiryo",
-    sans-serif;
-
-    background:var(--background);
-
-    color:var(--text);
-
-    line-height:1.7;
-
-    min-height:100vh;
-
+/* 選択肢エリア */
+#choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-img{
-
-    max-width:100%;
-
+/* 選択肢ボタン（スマホ最適） */
+.choice-btn {
+  padding: 16px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+  text-align: left;
 }
 
-a{
-
-    text-decoration:none;
-
-    color:inherit;
-
+.choice-btn:active {
+  transform: scale(0.98);
 }
 
-button{
-
-    border:none;
-
-    cursor:pointer;
-
-    font-size:1rem;
-
+/* 次へボタン */
+#nextBtn {
+  margin-top: 25px;
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  border: none;
+  border-radius: 12px;
+  background: #2d6cdf;
+  color: white;
+  font-weight: bold;
 }
 
-.container{
-
-    width:min(1100px,92%);
-
-    margin:auto;
-
-    padding:30px 0 60px;
-
+/* 結果 */
+#result {
+  margin-top: 30px;
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
 }
 
-header{
-
-    background:
-
-    linear-gradient(
-    135deg,
-    var(--primary),
-    var(--primary-dark)
-    );
-
-    color:white;
-
-    padding:45px 20px;
-
-    text-align:center;
-
-    box-shadow:var(--shadow);
-
+/* 正解・不正解表示 */
+.correct {
+  background: #d4f8d4 !important;
+  border-color: #2ecc71 !important;
 }
 
-header h1{
-
-    font-size:2.4rem;
-
-    margin-bottom:10px;
-
-}
-
-header p{
-
-    opacity:.9;
-
-}
-
-.card{
-
-    background:var(--card);
-
-    border-radius:var(--radius);
-
-    box-shadow:var(--shadow);
-
-    transition:var(--transition);
-
-}
-
-.card:hover{
-
-    transform:translateY(-6px);
-
-}
-
-footer{
-
-    margin-top:50px;
-
-    padding:30px;
-
-    text-align:center;
-
-    color:var(--subtext);
-
-    font-size:.9rem;
-
-}
-
-.grid{
-
-    display:grid;
-
-    gap:20px;
-
-}
-
-.btn{
-
-    display:inline-block;
-
-    background:var(--primary);
-
-    color:white;
-
-    padding:14px 26px;
-
-    border-radius:10px;
-
-    transition:var(--transition);
-
-}
-
-.btn:hover{
-
-    background:var(--primary-dark);
-
-}
-
-.badge{
-
-    display:inline-block;
-
-    padding:4px 12px;
-
-    border-radius:30px;
-
-    font-size:.8rem;
-
-    background:var(--secondary);
-
-    color:white;
-
-}
-
-.hidden{
-
-    display:none !important;
-
-}
-
-.center{
-
-    text-align:center;
-
-}
-
-.mt20{
-
-    margin-top:20px;
-
-}
-
-.mt30{
-
-    margin-top:30px;
-
-}
-
-.mt40{
-
-    margin-top:40px;
-
-}
-
-.mb20{
-
-    margin-bottom:20px;
-
-}
-
-@media(max-width:768px){
-
-header h1{
-
-font-size:1.9rem;
-
-}
-
-.container{
-
-width:94%;
-
-}
-
+.wrong {
+  background: #ffd6d6 !important;
+  border-color: #e74c3c !important;
 }
